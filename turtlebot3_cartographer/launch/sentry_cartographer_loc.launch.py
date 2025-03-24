@@ -30,12 +30,13 @@ def generate_launch_description():
     tf2_base_link_lidar_base = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['0', '0', '0.5', '1', '0', '0', '0', 'base_link', 'lidar_base']
+        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'lidar_base']
     )
 
     bringup_dir = get_package_share_directory('turtlebot3_cartographer')
     cartographer_config_dir = os.path.join(bringup_dir, 'config')
     configuration_basename = 'noimu_lds_2d.lua'
+    pbstream_path="/home/keitaro/map.pbstream"
 
     use_sim_time = False
     resolution = '0.05'
@@ -48,7 +49,8 @@ def generate_launch_description():
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=['-configuration_directory', cartographer_config_dir,
-                       '-configuration_basename', configuration_basename]
+                       '-configuration_basename', configuration_basename,
+                       '-load_state_filename', pbstream_path]
     )
 
     occupancy_grid_node = Node(
@@ -59,24 +61,11 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec]
     )
-    
-    nav2_config = os.path.join(cartographer_config_dir, 'nav2_param.yaml')
-
-    nav2_launch = IncludeLaunchDescription(
-        launch_description_source=PythonLaunchDescriptionSource([
-            get_package_share_directory('nav2_bringup'),
-            '/launch/navigation_launch.py'
-        ]),
-        launch_arguments={
-                'use_sim_time': 'False',
-                'params_file': nav2_config,
-        }.items()
-    )
 
     rviz2_config = os.path.join(
         get_package_share_directory('turtlebot3_cartographer'),
         'rviz',
-        'tb3_cartographer_nav.rviz'
+        'tb3_cartographer.rviz'
     )
 
     rviz2_node = Node(
@@ -84,8 +73,7 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        arguments=[["-d"], [rviz2_config]],
-        remappings=[('/move_base_simple/goal','/goal_pose')] #目標位置姿勢を示すTopic
+        arguments=[["-d"], [rviz2_config]]
     )
 
     ld = LaunchDescription()
@@ -94,7 +82,6 @@ def generate_launch_description():
     ld.add_action(tf2_base_link_lidar_base)
     ld.add_action(cartographer_node)
     ld.add_action(occupancy_grid_node)
-    ld.add_action(nav2_launch)
     ld.add_action(rviz2_node)
     return ld
 

@@ -35,6 +35,7 @@ def generate_launch_description():
 
     bringup_dir = get_package_share_directory('turtlebot3_cartographer')
     cartographer_config_dir = os.path.join(bringup_dir, 'config')
+    cartographer_map_dir = os.path.join(bringup_dir, 'map')
     configuration_basename = 'noimu_lds_2d_nav.lua'
 
     use_sim_time = False
@@ -61,6 +62,7 @@ def generate_launch_description():
     )
     
     nav2_config = os.path.join(cartographer_config_dir, 'nav2_param.yaml')
+    nav2_map = os.path.join(cartographer_map_dir, 'map.yaml')
 
     nav2_launch = IncludeLaunchDescription(
         launch_description_source=PythonLaunchDescriptionSource([
@@ -70,6 +72,7 @@ def generate_launch_description():
         launch_arguments={
                 'use_sim_time': 'False',
                 'params_file': nav2_config,
+                'map': nav2_map,
         }.items()
     )
 

@@ -30,7 +30,7 @@ def generate_launch_description():
     tf2_base_link_lidar_base = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['0', '0', '0.5', '1', '0', '0', '0', 'base_link', 'lidar_base']
+        arguments=['0.13', '0', '0.6', '1', '0', '0', '0', 'base_link', 'lidar_base']
     )
 
     bringup_dir = get_package_share_directory('turtlebot3_cartographer')
